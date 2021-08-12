@@ -33,10 +33,10 @@ function return_error() {
 }
 
 function analyze_scan_results() {
-  if [[ $high -gt 0 ]]; then
+  if [[ $high -gt 0 ]] && $FAILBUILD; then
     return_scan_results
     return_error
-  elif [[ $high -gt 0 ]]; then
+  elif [[ $high -gt 0 ]] && $FAILBUILD; then
     echo "ERROR: There are HIGH vulnerabilties. Stopping build."
     return_scan_results
     return_error
@@ -47,8 +47,9 @@ function analyze_scan_results() {
 
 REPONAME="${1:?Need to set REPONAME(first param) non-empty}"
 BUILDID="${2:?Need to set BUILDID(second param) non-empty}"
+FAILBUILD="${3:-true}"
 hash=$@
 
 wait_for_scan $hash
 check_for_high_critical_vuln $hash
-analyze_scan_results
+analyze_scan_results $hash
